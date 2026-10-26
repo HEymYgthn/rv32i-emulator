@@ -1,25 +1,26 @@
-# RV32I C-Based Low-Level Systems Emulator
+# Hybrid Solidity Static Vulnerability Analysis Engine
 
-A lightweight, bare-metal compatible RISC-V RV32I instruction set architecture (ISA) emulator written from scratch in pure C. Designed for high-performance systems simulation, low-latency execution analysis, and computer architecture research.
+A high-performance, hybrid static analysis tool engineered in C and Python to detect critical security vulnerabilities in Ethereum smart contracts. Designed for automated vulnerability assessment, abstract syntax tree (AST) pattern matching, and secure smart contract development.
 
 ## Features
 
-* **Complete RV32I Base Instruction Set:** Supports arithmetic (`ADD`, `SUB`, `ADDI`), logical (`AND`, `OR`, `XOR`, `ANDI`, `ORI`), memory access (`LW`, `SW`), conditional branches (`BEQ`, `BNE`), and unconditional jumps (`JAL`).
-* **Von Neumann Architecture Simulation:** Implements a linear, dynamically allocated byte-addressable memory model (`1 MB`) with strict bounds checking.
-* **Little-Endian Memory Layout & Byte Assembly:** Manual assembly of 32-bit instructions from raw byte streams.
-* **Zero Dependencies:** Written in standard C (`C99`) with zero external libraries, ensuring portability across bare-metal environments, Linux systems, and terminal emulators.
-* **Register State Dumper:** Provides detailed architectural state inspection (`x0` through `x31`) post-execution.
+* **Hybrid Architecture:** Combines a low-level, high-throughput C-based lexical stream scanner with a Python-powered rule execution and AST inspection engine.
+* **Critical Vulnerability Detection:** Scans for prevalent smart contract security flaws including:
+  * Reentrancy attacks (`CALL` value transfers before state updates)
+  * Integer arithmetic overflows and underflows
+  * Unchecked low-level calls (`call`, `delegatecall`)
+  * Access control and authorization bypass vectors
+* **Modular Rule Engine:** Extensible architecture allowing developers to define custom security patterns and heuristics.
+* **Structured Output:** Generates machine-readable JSON security reports detailing vulnerability types, line numbers, and severity tiers.
+* **Zero-Overhead Parsing:** Rapidly processes raw `.sol` source files with minimal memory footprint.
 
 ---
 
 ## Architectural Overview
 
-The emulator models the core components of a 32-bit RISC-V processor:
-1. **CPU State (`CPU` struct):** Manages 32 general-purpose registers (`uint32_t`), the Program Counter (`PC`), and a pointer to the simulated memory space.
-2. **Fetch-Decode-Execute Pipeline:**
-   * **Fetch:** Retrieves 32-bit instructions from memory using little-endian byte reassembly.
-   * **Decode:** Extracts instruction fields (`opcode`, `rd`, `funct3`, `rs1`, `rs2`, `funct7`) and handles immediate sign-extensions for I, S, B, and J type instructions.
-   * **Execute:** Evaluates operations and updates register states while ensuring `x0` remains hardwired to zero.
+The engine operates on a dual-tier pipeline:
+1. **C Core (Lexical Analysis & High-Speed Ingestion):** Handles raw file I/O, memory mapping, and high-speed tokenization to filter out irrelevant whitespace and comment structures.
+2. **Python Frontend (Pattern Matching & AST Heuristics):** Interfacing with the C core output, it constructs behavioral patterns, evaluates control flow graphs, and flags security violations against established vulnerability taxonomies.
 
 ---
 
@@ -27,5 +28,7 @@ The emulator models the core components of a 32-bit RISC-V processor:
 
 ```text
 .
-├── main.c        # Core emulator logic, memory loader, and execution engine
-└── README.md     # Project documentation and architecture guide
+├── core/           # C-based low-level stream parser and token scanner
+├── engine/         # Python static analysis and rule-matching logic
+├── tests/          # Vulnerable sample smart contracts for test benchmarking
+└── README.md       # Project documentation and architecture guide
